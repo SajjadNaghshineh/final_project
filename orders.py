@@ -18,7 +18,6 @@ class Orders:
                 
     # read data from csv file
     def read_orders_csv(self):
-        # if guard clause technique
         if not os.path.exists("orders.csv"):
             self.create_orders_csv()
             
@@ -26,8 +25,7 @@ class Orders:
         return self.df
     
     # append data to csv file
-    def append_orders_data(self):    
-        # if guard clause technique
+    def append_orders_data(self):
         if not os.path.exists("orders.csv"):
             self.create_orders_csv()
             
@@ -51,11 +49,10 @@ class Orders:
             
     # change orders data
     def change_orders_data(self):
-        self.question1 = input("Enter the order id : ")
-        self.question2 = input(f"What column you want to change, {self.fieldnames}: ")
-        self.question3 = input("Enter new value: ")
+        self.id_question = input("Enter the order id : ")
+        self.column_question = input(f"What column you want to change, {self.fieldnames}: ")
+        self.value_question = input("Enter new value: ")
         
-        # if guard clause technique
         if not os.path.exists("orders.csv"):
             self.create_orders_csv()
             
@@ -67,7 +64,7 @@ class Orders:
             self.writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames)
             self.writer.writeheader()
             for row in self.rows:
-                if row["order_id"] == self.question1:
-                    row[self.question2] = self.question3
+                if row["order_id"] == self.id_question:
+                    row[self.column_question] = self.value_question
                 self.writer.writerow(row)
                 
