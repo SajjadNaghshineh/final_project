@@ -1,3 +1,0 @@
-order_id,customer_name,shop_id,product_id,quantity,order_date,recieve_date
-1,reza,1,1,10,2023-12-08,nan
-2,ali,2,2,20,2023-12-08,don
