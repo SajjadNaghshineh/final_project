@@ -1,12 +1,6 @@
 from file_manager import FileManager
 
-class CustomerOrders:
-    pass
-
-class ShopOrders:
-    pass
-
-class TotalOrders(FileManager):
+class Orders(FileManager):
     fieldnames = ["order_id", "username", "shop_id", "product_id", "quantity", "order_date", "recieve_date"]
     filepath = "orders.csv"
     

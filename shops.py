@@ -1,9 +1,6 @@
 from file_manager import FileManager
 
-class CentralShop:
-    pass
-
-class SubsetShop(FileManager):
+class Shops(FileManager):
     fieldnames = ["shop_id", "shop_name", "unsend_orders", "total_sell"]
     filepath = "sub_shop.csv"
     
