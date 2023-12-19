@@ -4,15 +4,15 @@ import pandas as pd
 from random import randint
 
 class Products:
-    products_header = ["product_id", "product_name", "shop_name", "production_date", "expiration_period", "bought_count", "available_count", "price"]
+    products_header = ["product_id", "product_name", "company_name", "production_date", "expiration_date", "bought_count", "available_count", "price"]
     products_filepath = "products.csv"
     
     products_data = {
         "product_id": [],
         "product_name": [],
-        "shop_name": [],
+        "company_name": [],
         "production_date": [],
-        "expiration_period": [],
+        "expiration_date": [],
         "bought_count": [],
         "available_count": [],
         "price": []
@@ -26,9 +26,9 @@ class Products:
             for row in reader:
                 products_data["product_id"].append(row[0])
                 products_data["product_name"].append(row[1])
-                products_data["shop_name"].append(row[2])
+                products_data["company_name"].append(row[2])
                 products_data["production_date"].append(row[3])
-                products_data["expiration_period"].append(row[4])
+                products_data["expiration_date"].append(row[4])
                 products_data["bought_count"].append(row[5])
                 products_data["available_count"].append(row[6])
                 products_data["price"].append(row[7])
@@ -54,8 +54,6 @@ class Products:
             column = input(f"What column you want to change? {self.products_header}: ")
             if column == "product_id":
                 print("You are not allowed to change product id field!!!")
-            elif column == "shop_name":
-                raise ValueError("You must change shop name from edit_shop.")
             else:
                 break
             

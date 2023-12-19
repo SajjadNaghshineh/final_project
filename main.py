@@ -1,7 +1,7 @@
 import os
 os.system("cls")
 
-products_header = ["product_id", "product_name", "shop_name", "production_date", "expiration_period", "bought_count", "available_count", "price"]
+products_header = ["product_id", "product_name", "company_name", "production_date", "expiration_period", "bought_count", "available_count", "price"]
 
 customers_header = ["username", "fullname", "user_id", "phone", "total_price", "sale_amount", "unpaid_amount"]
 
