@@ -2,11 +2,9 @@ import os
 import csv
 import pandas as pd
 from random import randint
+from products import Products
 
-class CentralShop:
-    pass
-
-class Shops:
+class Shops(Products):
     shops_header = ["shop_id", "shop_name", "unsend_orders", "total_sell"]
     shops_filepath = "shops.csv"
     
@@ -38,7 +36,11 @@ class Shops:
                         break
             elif i == "shop_name":
                 name = input(f"Enter the {i}: ")
-                self.shops_data[i].append(name)
+                if name not in self.shops_data["shop_name"]:
+                    self.shops_data[i].append(name)
+                else:
+                    self.shops_data["shop_id"].remove(sh_id)
+                    raise ValueError(f"This shop: {name} is already exists.")
             else:
                 self.shops_data[i].append(0)
                 
@@ -67,6 +69,15 @@ class Shops:
         
         self.update_shops()
         
+        # when we change shop name here, it must be changed for products with the same shop name
+        old_value = self.shops_data["shop_name"][idx]
+        
+        for i in range(len(self.products_data["shop_name"])):
+            if i == old_value:
+                self.products_data["shop_name"][i] = value
+        else:
+            self.update_products()
+            
     def update_shops(self):
         df = pd.DataFrame(self.shops_data)
         df.to_csv(self.shops_filepath, index=False)

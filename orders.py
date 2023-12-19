@@ -2,14 +2,9 @@ import os
 import csv
 import pandas as pd
 import datetime
+from shops import Shops
 
-class CustomerOrders:
-    pass
-
-class ShopOrders:
-    pass
-
-class Orders:
+class Orders(Shops):
     orders_header = ["order_id", "username", "shop_id", "product_id", "quantity", "order_date", "recieve_date"]
     orders_filepath = "orders.csv"
     
@@ -51,6 +46,12 @@ class Orders:
         self.orders_data["recieve_date"][idx] = today
         
         self.update_orders()
+        
+        # when we set recieve date, unsend_orders in orders must be minus one
+        shop_id = int(self.orders_data["shop_id"][idx])
+        self.shops_data["unsend_orders"][shop_id] -= 1
+        
+        self.update_shops()
         
     def update_orders(self):
         df = pd.DataFrame(self.orders_data)

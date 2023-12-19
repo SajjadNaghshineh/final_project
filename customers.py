@@ -1,8 +1,9 @@
 import os
 import csv
 import pandas as pd
+from orders import Orders
 
-class Customers:
+class Customers(Orders):
     customers_header = ["username", "fullname", "user_id", "phone", "total_price", "sale_amount", "unpaid_amount"]
     customers_filepath = "customers.csv"
     
@@ -99,6 +100,16 @@ class Customers:
             
         self.update_customers()
         
+        # if username changed here, it must be changed in orders
+        if column == "username":
+            old_value = self.customers_data["username"][idx]
+            
+            for i in range(len(self.orders_data["username"])):
+                if i == old_value:
+                    self.orders_data["username"][i] = value
+            else:
+                self.update_orders()
+                
     def update_customers(self):
         df = pd.DataFrame(self.customers_data)
         df.to_csv(self.customers_filepath, index=False)
@@ -108,5 +119,3 @@ class Customers:
         df = pd.read_csv(self.customers_filepath)
         return df
     
-class CustomerClub:
-    pass
