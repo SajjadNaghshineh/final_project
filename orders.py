@@ -1,23 +1,63 @@
-from file_manager import FileManager
+import os
+import csv
+import pandas as pd
+import datetime
 
-class Orders(FileManager):
-    fieldnames = ["order_id", "username", "shop_id", "product_id", "quantity", "order_date", "recieve_date"]
-    filepath = "orders.csv"
+class CustomerOrders:
+    pass
+
+class ShopOrders:
+    pass
+
+class Orders:
+    orders_header = ["order_id", "username", "shop_id", "product_id", "quantity", "order_date", "recieve_date"]
+    orders_filepath = "orders.csv"
     
-    # first of all we create orders.csv file
-    def __init__(self):
-        self.create_file(self.filepath, self.fieldnames)
-        
-    # read data from orders.csv file
-    def read_orders_csv(self):
-        self.df = self.read_file(self.filepath)
-        return self.df
+    orders_data = {
+        "order_id": [],
+        "username": [],
+        "shop_id": [],
+        "product_id": [],
+        "quantity": [],
+        "order_date": [],
+        "recieve_date": []
+    }
     
-    # append data to orders.csv file
-    def append_orders_csv(self):
-        self.append_data(self.filepath, self.fieldnames, "order_id")
+    if os.path.exists(orders_filepath):
+        with open(orders_filepath, "r") as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader)
+            
+            for row in reader:
+                orders_data["order_id"].append(row[0])
+                orders_data["username"].append(row[1])
+                orders_data["shop_id"].append(row[2])
+                orders_data["product_id"].append(row[3])
+                orders_data["quantity"].append(row[4])
+                orders_data["order_date"].append(row[5])
+                orders_data["recieve_date"].append(row[6])
+                
+    def edit_order(self):
+        while True:
+            orderid = input("Enter the order id: ")
+            if orderid not in self.orders_data["order_id"]:
+                print(f"This order id: {orderid} is not available, try again ...")
+            else:
+                break
+            
+        today = datetime.date.today()
         
-    # change orders.csv data
-    def change_orders_csv(self):
-        self.change_data(self.filepath, self.fieldnames, "order_id")
+        idx = self.orders_data["order_id"].index(orderid)
+        self.orders_data["recieve_date"][idx] = today
         
+        self.update_orders()
+        
+    def update_orders(self):
+        df = pd.DataFrame(self.orders_data)
+        df.to_csv(self.orders_filepath, index=False)
+        
+    def read_orders(self):
+        self.update_orders()
+        df = pd.read_csv(self.orders_filepath)
+        return df
+    
