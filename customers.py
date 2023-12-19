@@ -2,9 +2,10 @@ import os
 import csv
 import pandas as pd
 from orders import Orders
+from products import Products
 
-class Customers(Orders):
-    customers_header = ["username", "fullname", "user_id", "phone", "total_price", "sale_amount", "unpaid_amount"]
+class Customers(Orders, Products):
+    customers_header = ["username", "fullname", "user_id", "phone", "total_buy", "paid_amount", "unpaid_amount", "credit", "discount"]
     customers_filepath = "customers.csv"
     
     customers_data = {
@@ -12,9 +13,11 @@ class Customers(Orders):
         "fullname": [],
         "user_id": [],
         "phone": [],
-        "total_price": [],
-        "sale_amount": [],
-        "unpaid_amount": []
+        "total_buy": [],
+        "paid_amount": [],
+        "unpaid_amount": [],
+        "credit": [],
+        "discount": []
     }
     
     if os.path.exists(customers_filepath):
@@ -27,9 +30,11 @@ class Customers(Orders):
                 customers_data["fullname"].append(row[1])
                 customers_data["user_id"].append(row[2])
                 customers_data["phone"].append(row[3])
-                customers_data["total_price"].append(row[4])
-                customers_data["sale_amount"].append(row[5])
+                customers_data["total_buy"].append(row[4])
+                customers_data["paid_amount"].append(row[5])
                 customers_data["unpaid_amount"].append(row[6])
+                customers_data["credit"].append(row[7])
+                customers_data["discount"].append(row[8])
                 
     def add_customer(self):
         for i in self.customers_header:
@@ -52,7 +57,7 @@ class Customers(Orders):
     def edit_customer(self):
         while True:
             column = input(f"What column you want to change? {self.customers_header}: ")
-            if column in ["total_price", "sale_amount", "unpaid_amount"]:
+            if column in ["total_buy", "discount", "paid_amount", "unpaid_amount", "credit"]:
                 print(f"You are not allowed to change {column}, this value will be automatically updated")
             else:
                 break
@@ -119,3 +124,97 @@ class Customers(Orders):
         df = pd.read_csv(self.customers_filepath)
         return df
     
+    def check_customers_payment(self):
+        df_products = self.read_products()
+        df_orders = self.read_orders()
+        
+        for name in self.customers_data["username"]:
+            ids = df_orders[df_orders["username"] == name]["product_id"].values
+            qua = df_orders[df_orders["username"] == name]["quantity"].values
+            
+            total = 0
+            for i in range(len(ids)):
+                product_price = df_products[df_products["product_id"] == ids[i]]["price"].values[0]
+                product_price = float(product_price) * float(qua[i])
+                
+                total += product_price
+                
+            user_idx = self.customers_data["username"].index(name)
+            self.customers_data["total_buy"][user_idx] = total
+            
+            if float(self.customers_data["paid_amount"][user_idx]) == 0:
+                self.customers_data["unpaid_amount"][user_idx] = total
+            else:
+                unpaid = float(total) - float(self.customers_data["paid_amount"][user_idx])
+                self.customers_data["unpaid_amount"] = unpaid
+                
+            ids = df_orders[df_orders["username"] == name]["product_id"].values[-1]
+            qua = df_orders[df_orders["username"] == name]["quantity"].values[-1]
+            
+            last_order_price = df_products[df_products["product_id"] == ids]["price"].values[0]
+            last_order_price = float(last_order_price) * float(qua)
+            
+            credit = float(total) // 500000 * 50000
+            self.customers_data["credit"][user_idx] = credit
+            
+            discount = last_order_price // 100000 * 5
+            self.customers_data["discount"][user_idx] = discount
+            
+        self.update_customers()
+        
+    def customers_club(self):
+        self.check_customers_payment()
+        df_customers = self.read_customers()
+        df_products = self.read_products()
+        df_orders = self.read_orders()
+        
+        user_name = input("Enter your username: ")
+        if user_name not in self.customers_data["username"]:
+            raise ValueError(f"User not found by this username: {user_name}")
+        
+        idx = self.customers_data["username"].index(user_name)
+        user_discount = df_customers[df_customers["username"] == user_name]["discount"].values[0]
+        user_credit = df_customers[df_customers["username"] == user_name]["credit"].values[0]
+        
+        ids = df_orders[df_orders["username"] == user_name]["product_id"].values[-1]
+        qua = df_orders[df_orders["username"] == user_name]["quantity"].values[-1]
+        
+        last_order_price = df_products[df_products["product_id"] == ids]["price"].values[0]
+        last_order_price = float(last_order_price) * float(qua)
+        
+        if float(self.customers_data["unpaid_amount"][idx]) == 0:
+            question = input("Which option you want to use, credit or discount? ")
+            
+            if question == "credit":
+                if last_order_price < float(user_credit):
+                    print("You can't use your credit because it is greater than your order price.")
+                else:
+                    x = last_order_price - float(user_credit)
+                    y = float(self.customers_data["paid_amount"][idx]) + x
+                    self.customers_data["paid_amount"][idx] = y
+                    z = float(self.customers_data["unpaid_amount"][idx]) - x
+                    self.customers_data["unpaid_amount"][idx] = z
+                    
+                    self.customers_data["credit"][idx] = 0
+            else:
+                discount = float(user_discount) * float(last_order_price) / 100
+                result_price = float(last_order_price) - discount
+                
+                y = float(self.customers_data["paid_amount"][idx]) + result_price
+                self.customers_data["paid_amount"] = y
+
+                self.customers_data["discount"] = 0
+        else:
+            print("You can't use credit pay becaue you have unpaid amount.")
+            discount = float(user_discount) * float(last_order_price) / 100
+            result_price = float(last_order_price) - discount
+            
+            y = float(self.customers_data["paid_amount"][idx]) + result_price
+            self.customers_data["paid_amount"] = y
+            z = float(self.customers_data["unpaid_amount"]) - result_price
+            self.customers_data["unpaid_amount"] = z
+            
+            self.customers_data["discount"] = 0
+            
+        self.update_customers()
+        

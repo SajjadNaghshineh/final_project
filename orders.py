@@ -62,5 +62,3 @@ class Orders(Shops):
         df = pd.read_csv(self.orders_filepath)
         return df
     
-obj = Orders()
-print(obj.read_orders())
