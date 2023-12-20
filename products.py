@@ -33,6 +33,9 @@ class Products:
                 products_data["available_count"].append(row[6])
                 products_data["price"].append(row[7])
                 
+    def __init__(self):
+        self.update_products()
+        
     def add_product(self):
         for i in self.products_header:
             if i == "product_id":

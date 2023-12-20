@@ -25,6 +25,9 @@ class Shops:
                 shops_data["unsend_orders"].append(row[2])
                 shops_data["total_sell"].append(row[3])
                 
+    def __init__(self):
+        self.update_shops()
+        
     def add_shop(self):
         for i in self.shops_header:
             if i == "shop_id":

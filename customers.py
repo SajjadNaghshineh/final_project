@@ -36,6 +36,9 @@ class Customers(Orders, Products):
                 customers_data["credit"].append(row[7])
                 customers_data["discount"].append(row[8])
                 
+    def __init__(self):
+        self.check_customers_payment()
+        
     def add_customer(self):
         for i in self.customers_header:
             if i == "username" or i == "user_id" or i == "phone":
@@ -132,33 +135,36 @@ class Customers(Orders, Products):
             ids = df_orders[df_orders["username"] == name]["product_id"].values
             qua = df_orders[df_orders["username"] == name]["quantity"].values
             
-            total = 0
-            for i in range(len(ids)):
-                product_price = df_products[df_products["product_id"] == ids[i]]["price"].values[0]
-                product_price = float(product_price) * float(qua[i])
+            if len(ids) != 0 and len(qua) != 0:
+                total = 0
+                for i in range(len(ids)):
+                    product_price = df_products[df_products["product_id"] == ids[i]]["price"].values[0]
+                    product_price = float(product_price) * float(qua[i])
+                    
+                    total += product_price
+                    
+                user_idx = self.customers_data["username"].index(name)
+                self.customers_data["total_buy"][user_idx] = total
                 
-                total += product_price
+                if float(self.customers_data["paid_amount"][user_idx]) == 0:
+                    self.customers_data["unpaid_amount"][user_idx] = total
+                else:
+                    unpaid = float(total) - float(self.customers_data["paid_amount"][user_idx])
+                    self.customers_data["unpaid_amount"][user_idx] = unpaid
+                    
+                last_id = ids[-1]
+                last_qua = qua[-1]
                 
-            user_idx = self.customers_data["username"].index(name)
-            self.customers_data["total_buy"][user_idx] = total
-            
-            if float(self.customers_data["paid_amount"][user_idx]) == 0:
-                self.customers_data["unpaid_amount"][user_idx] = total
-            else:
-                unpaid = float(total) - float(self.customers_data["paid_amount"][user_idx])
-                self.customers_data["unpaid_amount"] = unpaid
+                last_order_price = df_products[df_products["product_id"] == last_id]["price"].values[0]
+                last_order_price = float(last_order_price) * float(last_qua)
                 
-            ids = df_orders[df_orders["username"] == name]["product_id"].values[-1]
-            qua = df_orders[df_orders["username"] == name]["quantity"].values[-1]
-            
-            last_order_price = df_products[df_products["product_id"] == ids]["price"].values[0]
-            last_order_price = float(last_order_price) * float(qua)
-            
-            credit = float(total) // 500000 * 50000
-            self.customers_data["credit"][user_idx] = credit
-            
-            discount = last_order_price // 100000 * 5
-            self.customers_data["discount"][user_idx] = discount
+                if self.customers_data["credit"][user_idx] == 0:
+                    credit = float(total) // 500000 * 50000
+                    self.customers_data["credit"][user_idx] = credit
+                    
+                if self.customers_data["discount"][user_idx] == 0:
+                    discount = last_order_price // 100000 * 5
+                    self.customers_data["discount"][user_idx] = discount
             
         self.update_customers()
         
@@ -172,15 +178,19 @@ class Customers(Orders, Products):
         if user_name not in self.customers_data["username"]:
             raise ValueError(f"User not found by this username: {user_name}")
         
+        if user_name not in self.orders_data["username"]:
+            raise ValueError(f"This user: {user_name} hasn't bought anything yet.")
+        
         idx = self.customers_data["username"].index(user_name)
         user_discount = df_customers[df_customers["username"] == user_name]["discount"].values[0]
         user_credit = df_customers[df_customers["username"] == user_name]["credit"].values[0]
+        unpaid_amount = df_customers[df_customers["username"] == user_name]["unpaid_amount"].values[0]
         
-        ids = df_orders[df_orders["username"] == user_name]["product_id"].values[-1]
-        qua = df_orders[df_orders["username"] == user_name]["quantity"].values[-1]
+        last_id = df_orders[df_orders["username"] == user_name]["product_id"].values[-1]
+        last_qua = df_orders[df_orders["username"] == user_name]["quantity"].values[-1]
         
-        last_order_price = df_products[df_products["product_id"] == ids]["price"].values[0]
-        last_order_price = float(last_order_price) * float(qua)
+        last_order_price = df_products[df_products["product_id"] == last_id]["price"].values[0]
+        last_order_price = float(last_order_price) * float(last_qua)
         
         if float(self.customers_data["unpaid_amount"][idx]) == 0:
             question = input("Which option you want to use, credit or discount? ")
@@ -188,6 +198,8 @@ class Customers(Orders, Products):
             if question == "credit":
                 if last_order_price < float(user_credit):
                     print("You can't use your credit because it is greater than your order price.")
+                elif user_credit == 0:
+                    print("Your credit is finished.")
                 else:
                     x = last_order_price - float(user_credit)
                     y = float(self.customers_data["paid_amount"][idx]) + x
@@ -197,24 +209,31 @@ class Customers(Orders, Products):
                     
                     self.customers_data["credit"][idx] = 0
             else:
-                discount = float(user_discount) * float(last_order_price) / 100
-                result_price = float(last_order_price) - discount
+                if user_discount == 0:
+                    print("You have no discount right now.")
+                else:
+                    discount = float(user_discount) * float(last_order_price) / 100
+                    result_price = float(last_order_price) - discount
+                    
+                    y = float(self.customers_data["paid_amount"][idx]) + result_price
+                    self.customers_data["paid_amount"] = y
+
+                    self.customers_data["discount"] = 0
+        else:
+            if user_credit != 0:
+                print("You can't use credit pay becaue you have unpaid amount.")
+            if user_discount == 0:
+                print("You have no discount right now.")
+            else:
+                discount = float(user_discount) * float(unpaid_amount) / 100
+                result_price = float(unpaid_amount) - discount
                 
                 y = float(self.customers_data["paid_amount"][idx]) + result_price
-                self.customers_data["paid_amount"] = y
+                self.customers_data["paid_amount"][idx] = y
+                z = float(self.customers_data["unpaid_amount"][idx]) - result_price
+                self.customers_data["unpaid_amount"][idx] = z
+                
+                self.customers_data["discount"][idx] = 0
 
-                self.customers_data["discount"] = 0
-        else:
-            print("You can't use credit pay becaue you have unpaid amount.")
-            discount = float(user_discount) * float(last_order_price) / 100
-            result_price = float(last_order_price) - discount
-            
-            y = float(self.customers_data["paid_amount"][idx]) + result_price
-            self.customers_data["paid_amount"] = y
-            z = float(self.customers_data["unpaid_amount"]) - result_price
-            self.customers_data["unpaid_amount"] = z
-            
-            self.customers_data["discount"] = 0
-            
         self.update_customers()
         

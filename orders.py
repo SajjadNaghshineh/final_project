@@ -32,6 +32,9 @@ class Orders(Shops):
                 orders_data["order_date"].append(row[5])
                 orders_data["recieve_date"].append(row[6])
                 
+    def __init__(self):
+        self.update_orders()
+        
     def edit_order(self):
         while True:
             orderid = input("Enter the order id: ")
