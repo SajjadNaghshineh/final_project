@@ -9,3 +9,4 @@ product_id,product_name,company_name,production_date,expiration_date,bought_coun
 28291,chicken,gooshtiran,2023-12-15,2023-12-25,8,37,80000
 14034,salad,hani,2023-12-19,2023-12-22,19,4,17000
 15904,coffe,kaleh,2023-12-19,2024-01-20,15,85,75000
+11600,rice,hashemi,2023-12-20,2023-12-25,0,100,1500000

@@ -51,8 +51,10 @@ class Orders(Shops):
         self.update_orders()
         
         # when we set recieve date, unsend_orders in orders must be minus one
-        shop_id = int(self.orders_data["shop_id"][idx])
-        self.shops_data["unsend_orders"][shop_id] -= 1
+        shop_id = self.orders_data["shop_id"][idx]
+        shop_id = self.shops_data["shop_id"].index(shop_id)
+        x = int(self.shops_data["unsend_orders"][shop_id]) - 1
+        self.shops_data["unsend_orders"][shop_id] = x
         
         self.update_shops()
         
