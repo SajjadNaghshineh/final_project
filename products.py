@@ -6,7 +6,10 @@ import calendar
 import time
 from datetime import datetime
 
+# Products class manages products
 class Products:
+    # Initialize the base data, if products.csv exits we fill our data set by its file data,
+    # else empty
     products_header = ["product_id", "product_name", "company_name", "production_date", "expiration_date", "bought_count", "available_count", "price"]
     products_filepath = "products.csv"
     
@@ -37,6 +40,8 @@ class Products:
                 products_data["price"].append(row[7])
                 
     def __init__(self):
+        # Every time we create an instance of products class, we check the expired products that are
+        # availabe yet in our shop and also we analyse each product sell
         self.update_products()
         result = self.product_analysis()
         out_dated = self.about_to_expiration()
@@ -53,6 +58,7 @@ class Products:
         for i in self.products_header:
             if i == "product_id":
                 pro_id = randint(11111, 99999)
+                # we set a unique id for each product
                 while True:
                     if pro_id not in self.products_data[i]:
                         self.products_data[i].append(pro_id)
@@ -66,6 +72,7 @@ class Products:
         self.update_products()
         
     def edit_product(self):
+        # Edit products data can be done base on unique field product_id, also you can't change id
         while True:
             column = input(f"What column you want to change? {self.products_header}: ")
             if column == "product_id":
@@ -73,6 +80,7 @@ class Products:
             else:
                 break
             
+        # If entered id isn't in product_id's it alarm
         while True:
             id = input("Enter the product id: ")
             if int(id) in self.products_data["product_id"] or id in self.products_data["product_id"]:
@@ -82,6 +90,7 @@ class Products:
             
         value = input("Enter the new value: ")
         
+        # When we first add product_id, its value is int and when we read data from file its str, so ...
         try:
             idx = self.products_data["product_id"].index(int(id))
         except:
@@ -91,10 +100,12 @@ class Products:
         
         self.update_products()
         
+    # This function continiously update our data set
     def update_products(self):
         df = pd.DataFrame(self.products_data)
         df.to_csv(self.products_filepath, index=False)
         
+    # We use this function to read data in a human readable way
     def read_products(self):
         self.update_products()
         df = pd.read_csv(self.products_filepath)
@@ -132,7 +143,8 @@ class Products:
             days_diff = (today_date - date).days
             
             if days_diff >= 0:
-                products.append(self.products_data["product_name"][i])
+                if int(self.products_data["available_count"][i]) != 0:
+                    products.append(self.products_data["product_name"][i])
                 
         if len(products) != 0:
             return products

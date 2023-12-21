@@ -5,6 +5,11 @@ from customers import Customers
 from orders import Orders
 from shops import Shops
 
+"""
+In this program we use lists to easily change add data, change data, remove and retrieve data.
+In this way when we inherits classes, we can easilly change our data.
+"""
+
 print("The list of actions you can do:")
 print("1. Register a user")
 print("2. Change a user's data")
@@ -14,8 +19,9 @@ print("5. Add a product")
 print("6. Change a product's data")
 print("7. Enter the deliver order")
 print("8. Analyse customers club")
-
+print()
 print("Enter whatever except 1 to 8 to finish the program.")
+print()
 
 counter = 0
 while True:
@@ -80,12 +86,3 @@ while True:
     print("-" * 30)
     
 print("Program finished.")
-
-
-products_header = ["product_id", "product_name", "company_name", "production_date", "expiration_period", "bought_count", "available_count", "price"]
-
-customers_header = ["username", "fullname", "user_id", "phone", "total_buy", "paid_amount", "unpaid_amount", "credit", "discount"]
-
-orders_header = ["order_id", "username", "shop_id", "product_id", "quantity", "order_date", "recieve_date"]
-
-shops_header = ["shop_id", "shop_name", "unsend_orders", "total_sell"]

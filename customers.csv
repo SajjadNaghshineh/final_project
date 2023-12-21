@@ -1,9 +1,9 @@
 username,fullname,user_id,phone,total_buy,paid_amount,unpaid_amount,credit,discount
-ali_yadegari,ali yadegari,0123456789,09213984526,75000.0,0,75000.0,0.0,0.0
+ali_yadegari,ali yadegari,0123456789,09213984526,0.0,0,0.0,0.0,0.0
 reza_zamani,reza zamani,1234567890,09921457456,0,0,0.0,0,0
 hossein_ahmadi,hossein ahmadi,2345678910,09104587752,0,0,0,0,0
-kamyar_mir,kamyar mir,3456789120,09198254698,150000.0,0,150000.0,0.0,5.0
+kamyar_mir,kamyar mir,3456789120,09198254698,0.0,0,0.0,0.0,0.0
 sogol_hashemi,sogol hashemi,4567891230,09198456325,0,0,0,0,0
-fatemeh_vali,fatemeh vali,5678912340,09914785123,700000.0,0,700000.0,50000.0,35.0
-farmia_beigi,farima beigi,6789123450,09014587632,100000.0,20000,80000.0,0.0,5.0
+fatemeh_vali,fatemeh vali,5678912340,09914785123,0.0,0,0.0,0,0
+farmia_beigi,farima beigi,6789123450,09014587632,0.0,0,0.0,0.0,0.0
 sajjadngh,sajjad naghshineh,0025154785,09924587456,0,0,0,0,0
